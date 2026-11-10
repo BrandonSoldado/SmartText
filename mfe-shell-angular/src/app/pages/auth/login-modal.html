@@ -1,0 +1,33 @@
+<div class="modal-overlay">
+  <div class="modal-box">
+    <button class="close-btn" (click)="cerrar.emit()">&times;</button>
+
+    <div class="modal-content-single">
+      <span class="modal-greeting">BIENVENIDO DE NUEVO</span>
+      <h2 class="modal-title">Inicia sesión en SmartTex</h2>
+
+      @if (error()) {
+        <div class="form-error">{{ error() }}</div>
+      }
+
+      <form class="auth-form" (ngSubmit)="onSubmit()">
+        <label>Dirección de correo electrónico</label>
+        <input type="email" name="email" placeholder="tucorreo@email.com"
+               [(ngModel)]="email" required />
+
+        <label>Contraseña</label>
+        <input type="password" name="password" placeholder="Ingresa la contraseña"
+               [(ngModel)]="password" required />
+
+        <button type="submit" class="btn-submit" [disabled]="loading()">
+          {{ loading() ? 'INGRESANDO...' : 'INICIAR SESIÓN' }}
+        </button>
+      </form>
+
+      <div class="auth-prompt">
+        ¿Aún no tienes una cuenta?
+        <span class="switch-link" (click)="irARegistro.emit()">Regístrate GRATIS</span>
+      </div>
+    </div>
+  </div>
+</div>

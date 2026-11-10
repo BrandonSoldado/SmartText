@@ -1,0 +1,63 @@
+<div class="home-wrapper">
+  <!-- ============ NAVBAR ============ -->
+  <nav class="navbar-home">
+    <div class="navbar-logo">
+      <img src="favicon.svg" alt="SmartTex Logo" class="logo-icon" />
+      <span class="logo-text">SmartTex</span>
+    </div>
+
+    <div class="navbar-actions">
+      <button class="btn-login-text" (click)="activeModal.set('login')">Iniciar sesión</button>
+      <button class="btn-register-solid" (click)="activeModal.set('register')">Cuenta gratuita</button>
+    </div>
+  </nav>
+
+  <!-- ============ HERO ============ -->
+  <main class="hero-section">
+    <div class="hero-content">
+      <span class="hero-subtitle">TU NEGOCIO TEXTIL, MÁS INTELIGENTE</span>
+
+      <h1 class="hero-title">¡Compra y gestiona tus telas de forma inteligente!</h1>
+
+      <p class="hero-desc">
+        Pide tus telas como lo harías por WhatsApp: escribe "50 metros de lona azul" y nuestra
+        inteligencia artificial entiende tu pedido, verifica el stock de los rollos, procesa el pago y
+        emite tu factura en segundos. También puedes elegir tus productos manualmente desde el catálogo.
+      </p>
+
+      <p class="hero-desc">
+        Controla fábrica, almacén y ventas desde un solo lugar: trazabilidad de rollos por metraje,
+        control de calidad con visión artificial y reportes generados por voz o texto, listos para
+        exportar a PDF o Excel.
+      </p>
+
+      <p class="hero-desc">
+        Funciona incluso con mala conexión: tus operaciones se guardan en el dispositivo y se
+        sincronizan automáticamente cuando vuelve el internet, sin duplicar cobros ni pedidos.
+      </p>
+
+      <div class="hero-buttons">
+        <button class="btn-primary" (click)="activeModal.set('register')">¡Crea tu cuenta GRATIS!</button>
+      </div>
+    </div>
+
+    <div class="hero-visuals">
+      <img src="images/home-smarttex.png" alt="Interfaz de SmartTex" class="hero-image" />
+    </div>
+  </main>
+
+  <!-- ============ MODALES ============ -->
+  @if (activeModal() === 'login') {
+    <app-login-modal
+      (cerrar)="activeModal.set(null)"
+      (irARegistro)="activeModal.set('register')"
+    />
+  }
+
+  @if (activeModal() === 'register') {
+    <app-register-modal
+      (cerrar)="activeModal.set(null)"
+      (irALogin)="activeModal.set('login')"
+    />
+  }
+</div>

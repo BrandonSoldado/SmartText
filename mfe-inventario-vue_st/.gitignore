@@ -1,0 +1,22 @@
+# Variables de entorno y credenciales
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencias (Node, NestJS, Angular, React, Vue)
+**/node_modules/
+
+# Compilados y empaquetados
+**/dist/
+**/build/
+**/.output/
+
+# Caché de frameworks frontend
+**/.angular/cache/
+**/.vite/
+**/.cache/
+
+# Archivos de entorno y logs generales
+*.log
+.DS_Store
+Thumbs.db

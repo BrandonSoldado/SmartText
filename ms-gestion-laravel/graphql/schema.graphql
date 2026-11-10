@@ -1,0 +1,121 @@
+scalar JSON @scalar(class: "App\\GraphQL\\Scalars\\JsonObject")
+
+type Permiso { 
+    id: ID!
+    nombre: String!
+    descripcion: String 
+}
+
+type Rol { 
+    id: ID!
+    nombre: String!
+    permisos: [Permiso] @belongsToMany 
+}
+
+type Usuario { 
+    id: ID!
+    id_rol: Int!
+    nombres: String!
+    apellido_p: String
+    apellido_m: String
+    email: String!
+    foto: String
+    telefono: String
+    fecha_nacimiento: String
+    stripe_customer_id: String
+    rol: Rol @belongsTo 
+}
+
+type DetalleVenta { 
+    id_unidad_rollo: Int!
+    cantidad: Float!
+    precio: Float! 
+}
+
+type Venta { 
+    id: ID!
+    total: Float!
+    estado: String!
+    fecha: String!
+    hora: String!
+    motivo_cancelacion: String
+    usuario: Usuario @belongsTo
+    detalles: [DetalleVenta] @hasMany 
+}
+
+type AuthResponse { 
+    token: String!
+    usuario: Usuario! 
+}
+
+input DetalleVentaInput { 
+    id_unidad_rollo: Int!
+    cantidad: Float!
+    precio: Float! 
+}
+
+type Query {
+    # ==========================
+    # RUTAS PRIVADAS (Requieren Token JWT)
+    # ==========================
+    
+    # Permisos
+    listarPermisos: [Permiso!]! @all @guard(with: ["api"])
+    obtenerPermisoPorId(id: ID! @eq): Permiso @find @guard(with: ["api"])
+
+    # Roles
+    listarRoles: [Rol!]! @all @guard(with: ["api"])
+    obtenerRolPorId(id: ID! @eq): Rol @find @guard(with: ["api"])
+
+    # Usuarios
+    listarUsuarios: [Usuario!]! @all @guard(with: ["api"])
+    obtenerUsuarioPorId(id: ID! @eq): Usuario @find @guard(with: ["api"])
+
+    # Ventas
+    listarVentas: [Venta!]! @all @guard(with: ["api"])
+    obtenerVentaPorId(id: ID! @eq): Venta @find @guard(with: ["api"])
+}
+
+type Mutation {
+    # ==========================
+    # RUTAS PÚBLICAS (Sin Token)
+    # ==========================
+    crearUsuario(id_rol: Int!, nombres: String!, email: String!, passwords: String!, apellido_p: String, apellido_m: String, telefono: String, fecha_nacimiento: String, stripe_customer_id: String, foto: String): Usuario! @field(resolver: "App\\GraphQL\\Mutations\\UsuarioMutations@crear")
+    
+    loginUnico(email: String!, pass: String!): AuthResponse! @field(resolver: "App\\GraphQL\\Mutations\\AuthMutations@login")
+
+    # ==========================
+    # RUTAS PRIVADAS (Con Token)
+    # ==========================
+    crearPermiso(nombre: String!, descripcion: String): Permiso! @create @guard(with: ["api"])
+    
+    eliminarPermiso(id: ID! @eq): Boolean! @delete(model: "Permiso") @guard(with: ["api"])
+    
+    crearRol(nombre: String!, permisosIds: [Int!]): Rol! @field(resolver: "App\\GraphQL\\Mutations\\RolMutations@crear") @guard(with: ["api"])
+    
+    eliminarRol(id: ID! @eq): Boolean! @delete(model: "Rol") @guard(with: ["api"])
+    
+    eliminarUsuario(id: ID! @eq): Boolean! @delete(model: "Usuario") @guard(with: ["api"])
+    
+    crearVenta(id_usuario: Int!, total: Float!, detalles: [DetalleVentaInput!]!, idempotencyKey: String!): Venta! @field(resolver: "App\\GraphQL\\Mutations\\SagaVentasMutations@crear") @guard(with: ["api"])
+    
+    eliminarVenta(id: ID! @eq): Boolean! @delete(model: "Venta") @guard(with: ["api"])
+    
+    # ==========================
+    # AGENTE IA (Reportes y Analítica)
+    # formato (opcional): json | excel | pdf | word
+    # Si se pide excel/pdf/word, la respuesta incluye "archivo" { nombre, mime, base64 }
+    # ==========================
+    generarReporteNatural(
+        texto: String!
+        formato: String
+    ): JSON! @field(resolver: "App\\GraphQL\\Mutations\\ReporteMutations@generarReporteNatural") @guard(with: ["api"])
+
+    # ==========================
+    # AGENTE IA (Compras por Lenguaje Natural)
+    # ==========================
+    procesarCompraNatural(
+        texto: String!
+        id_usuario: Int # Opcional: si no se envía, el resolver lo extrae del token JWT del contexto
+    ): String! @field(resolver: "App\\GraphQL\\Mutations\\AgenteMutations@procesarCompraNatural") @guard(with: ["api"])
+}
